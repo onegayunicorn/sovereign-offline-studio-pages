@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sovereign Offline Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+ --bg:#070c16;--bg2:#0a1120;--card:#0b1322;--card2:#0e172a;--line:#1b2740;--line2:#263653;
+ --fg:#e9eef8;--muted:#8798b6;--gold:#f0b94b;--gold2:#ffd884;--ok:#3ddc97;--warn:#ffc857;--bad:#ff6b6b;
+ --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+ background:
+  repeating-linear-gradient(0deg,rgba(255,255,255,.026) 0 1px,transparent 1px 32px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.026) 0 1px,transparent 1px 32px),
+  radial-gradient(1000px 520px at 12% -8%,#13233f 0%,transparent 62%),
+  radial-gradient(820px 420px at 92% -4%,#1b1733 0%,transparent 58%),
+  var(--bg);
+ color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+ -webkit-font-smoothing:antialiased;font-size:15px;line-height:1.55;min-height:100vh;
+}
+.serif{font-family:'Instrument Serif',Georgia,'Times New Roman',serif;font-weight:400;letter-spacing:.2px}
+.mono{font-family:var(--mono)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px 100px}
+a{color:var(--gold2)}
+/* header */
+header.top{position:sticky;top:0;z-index:40;backdrop-filter:blur(16px);background:rgba(7,12,22,.88);border-bottom:1px solid var(--line)}
+.top-in{max-width:1080px;margin:0 auto;padding:13px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:11px;margin-right:auto}
+.logo{width:38px;height:38px;border-radius:11px;background:#101c33;border:1px solid #22304d;display:grid;place-items:center;color:var(--gold);font-size:16px}
+.brand h1{font-size:18.5px;margin:0;line-height:1.15;font-family:'Instrument Serif',Georgia,serif;font-weight:400}
+.brand .tag{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.tab{border:1px solid transparent;background:transparent;color:var(--muted);font:inherit;font-size:13.5px;padding:8px 14px;border-radius:10px;cursor:pointer;transition:.16s}
+.tab:hover{color:var(--fg);background:rgba(255,255,255,.045)}
+.tab.active{color:#f7dda6;background:#17233c;border-color:#263653}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px rgba(61,220,151,.85);margin-left:8px;vertical-align:middle}
+.dot.off{background:var(--bad);box-shadow:0 0 10px rgba(255,107,107,.75)}
+/* type + bits */
+.label{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin:0 0 14px}
+.h1{font-size:clamp(34px,7vw,52px);line-height:1.02;margin:0 0 16px;color:#fff}
+.h1 em{font-style:italic;color:var(--gold)}
+.lede{color:#a9b7cf;font-size:16px;max-width:56ch;margin:0 0 26px}
+.h2{font-size:30px;margin:0 0 4px;line-height:1.1}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 18px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.022),rgba(255,255,255,0) 60%),var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.row{display:flex;gap:10px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.row.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.hidden{display:none!important}
+.hint{font-family:var(--mono);font-size:11px;color:#6d7e9b;margin:10px 0 0;line-height:1.6}
+/* controls */
+.input,.ta,.num{width:100%;background:#0a1222;border:1px solid var(--line2);border-radius:11px;color:var(--fg);font:inherit;font-size:14px;padding:12px 14px;outline:none;transition:.16s}
+.input:focus,.ta:focus{border-color:#3a4d74;box-shadow:0 0 0 3px rgba(240,185,75,.09)}
+.ta{resize:vertical;line-height:1.55}
+.num{width:68px;padding:6px 8px;font-family:var(--mono);font-size:12px}
+select.input{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#7b8db0 50%),linear-gradient(135deg,#7b8db0 50%,transparent 50%);background-position:calc(100% - 18px) 52%,calc(100% - 13px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:36px}
+.btn{border:1px solid var(--line2);background:#131e33;color:var(--fg);font:inherit;font-size:13.5px;font-weight:500;padding:11px 16px;border-radius:11px;cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn:hover{background:#1a2740;border-color:#33456b}
+.btn:active{transform:translateY(1px)}
+.btn.gold{background:linear-gradient(180deg,#ffd07a,#efb14a);border-color:#e0a53f;color:#241a06;font-weight:600}
+.btn.gold:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:#a9b7cf}
+.btn.tiny{padding:4px 9px;font-size:11.5px;border-radius:8px}
+.btn.w-full{width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.seg{display:flex;gap:4px;background:#080f1d;border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px}
+.seg-btn{flex:1;border:0;background:transparent;color:#9aabc7;font:inherit;font-size:13px;padding:10px;border-radius:9px;cursor:pointer;transition:.16s}
+.seg-btn.active{background:#1a2740;color:#f7dda6;box-shadow:inset 0 0 0 1px #2b3d5f}
+.chk{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#93a4c1;cursor:pointer;user-select:none}
+.chk input{accent-color:#f0b94b;width:14px;height:14px}
+.code{background:#060c17;border:1px solid var(--line);border-radius:12px;padding:14px;font-family:var(--mono);font-size:12px;line-height:1.65;color:#b6c8e4;max-height:300px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0 0 12px}
+textarea.code{max-height:none;min-height:230px;resize:vertical;width:100%}
+/* builder */
+.b-grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:900px){.b-grid{grid-template-columns:minmax(0,420px) minmax(0,1fr)}}
+.frame{width:100%;height:420px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.thumb{width:100%;height:130px;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden;margin-bottom:10px;position:relative}
+.thumb iframe{width:200%;height:200%;border:0;transform:scale(.5);transform-origin:0 0;pointer-events:none}
+/* library */
+.libgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.libcard{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;transition:.16s}
+.libcard:hover{border-color:#2f4267;transform:translateY(-1px)}
+.libcard .nm{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:6px 0 2px}
+.libcard .meta{font-family:var(--mono);font-size:10px;color:#6d7e9b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid #2b3d5f;color:#9fb3d4;background:#0f1a2c}
+.chip.app{color:#ffe0a3;border-color:#5c4820;background:#241b09}
+.chip.ui{color:#b8a9ff;border-color:#3d3568;background:#141029}
+.empty{color:#6d7e9b;font-family:var(--mono);font-size:12.5px;padding:26px;border:1px dashed var(--line2);border-radius:12px;text-align:center;grid-column:1/-1}
+/* engines */
+.engines{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:14px}
+.eng{text-align:left;background:#0a1222;border:1px solid var(--line);border-radius:11px;padding:11px 12px;cursor:pointer;font:inherit;color:var(--fg);transition:.16s}
+.eng b{display:block;font-size:13px;font-weight:600}
+.eng span{display:block;font-family:var(--mono);font-size:10px;color:#71829f;margin-top:2px}
+.eng:hover{border-color:#2f4267}
+.eng.active{border-color:#e0a53f;background:#1d1707;box-shadow:0 0 0 1px rgba(240,185,75,.28)}
+/* log */
+.console{background:#050a13;border:1px solid var(--line);border-radius:12px;padding:10px;height:200px;overflow:auto;font-family:var(--mono);font-size:11.5px;line-height:1.7}
+.console .l{display:flex;gap:8px}
+.console .t{color:#4d5f7d;flex:0 0 66px}
+.console .ok{color:var(--ok)}.console .warn{color:var(--warn)}.console .bad{color:var(--bad)}
+/* toasts + modal */
+#toasts{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:90;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:#16223a;border:1px solid #2f4267;color:#e9eef8;padding:10px 16px;border-radius:11px;font-size:13px;box-shadow:0 12px 30px rgba(0,0,0,.5);animation:tin .22s ease-out;max-width:88vw}
+.toast.ok{border-color:#2e6b4f;color:#b9f5d5}
+.toast.bad{border-color:#6d2b2b;color:#ffc4c4}
+.toast.out{opacity:0;transition:.3s}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.modal{position:fixed;inset:0;z-index:95;background:rgba(3,6,12,.82);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-inner{width:min(960px,100%);height:min(82vh,760px);background:var(--card);border:1px solid var(--line2);border-radius:16px;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.modal-head .x{margin-left:auto;background:transparent;border:1px solid var(--line2);color:#9aabc7;width:30px;height:30px;border-radius:8px;cursor:pointer}
+#modal-frame{flex:1;width:100%;border:0;background:#fff}
+.pill{font-family:var(--mono);font-size:10px;color:#0c1220;background:#f0b94b;padding:2px 8px;border-radius:99px;letter-spacing:.06em}
+.sect{margin-top:34px}
+hr.sep{border:0;border-top:1px solid var(--line);margin:22px 0}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="logo">&#128273;</div>
+      <div>
+        <h1>Sovereign Offline Studio</h1>
+        <div class="tag">Local-first &middot; v1.0</div>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="archive">Archive</button>
+      <button class="tab" data-tab="builder">Builder</button>
+      <button class="tab" data-tab="runtime">Runtime</button>
+      <button class="tab" data-tab="library">Library</button>
+      <span style="font-family:var(--mono);font-size:10px;color:#7d8fae;margin-left:8px" id="netstate">online</span>
+      <span class="dot" id="netdot"></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ ARCHIVE ============ -->
+  <section id="panel-archive" class="panel">
+    <div class="sect" style="margin-top:34px">
+      <p class="label">No cloud &middot; No account &middot; No lock-in</p>
+      <h2 class="serif h1">Keep the web <em>on your terms.</em></h2>
+      <p class="lede">Turn any page into one self-contained file. Images and styles are sealed inside, so it opens anywhere, offline, for decades &mdash; and every interface on the page gets harvested into your Library for building new apps.</p>
+    </div>
+
+    <div class="card">
+      <div class="seg" id="arch-seg">
+        <button class="seg-btn active" data-mode="url">&#127760; From web address</button>
+        <button class="seg-btn" data-mode="paste">&#128203; Paste HTML</button>
+      </div>
+
+      <div id="arch-url">
+        <input id="arch-input" class="input mono" placeholder="https://example.com/article" autocapitalize="off" spellcheck="false"/>
+        <div style="height:10px"></div>
+        <button id="arch-go" class="btn gold w-full">&#8615; Fetch &amp; convert</button>
+        <p class="hint">Web-address conversion needs a connection. Everything after that stays on this device. If the site blocks cross-origin reads, the studio retries through a public relay &mdash; or use Paste HTML.</p>
+      </div>
+
+      <div id="arch-paste" class="hidden">
+        <textarea id="arch-html" class="ta mono" rows="9" placeholder="&lt;html&gt;... paste page source here ...&lt;/html&gt;"></textarea>
+        <div style="height:10px"></div>
+        <button id="arch-seal" class="btn gold w-full">Seal pasted HTML</button>
+      </div>
+
+      <hr class="sep"/>
+      <div class="row wrap" style="gap:18px">
+        <label class="chk"><input type="checkbox" id="arch-scripts"/> keep scripts</label>
+        <label class="chk"><input type="checkbox" id="arch-ui" checked/> harvest UI interfaces</label>
+        <label class="chk">max images <input type="number" id="arch-max" class="num" value="30" min="0" max="200"/></label>
+      </div>
+    </div>
+
+    <div id="arch-out" class="card hidden">
+      <div class="row between" style="margin-bottom:10px">
+        <span class="label" style="margin:0">Sealed output</span>
+        <span class="mono" style="font-size:11px;color:#7d8fae" id="arch-size"></span>
+      </div>
+      <pre class="code" id="arch-preview"></pre>
+      <div class="row wrap">
+        <button id="arch-dl" class="btn gold">&#11015; Download HTML</button>
+        <button id="arch-lib" class="btn">&#65291; Save to Library</button>
+        <button id="arch-open" class="btn ghost">&#8599; Open preview</button>
+      </div>
+    </div>
+
+    <div id="arch-snips"></div>
+  </section>
+
+  <!-- ============ BUILDER ============ -->
+  <section id="panel-builder" class="panel hidden">
+    <div class="sect" style="margin-top:34px">
+      <h2 class="serif h1" style="font-size:44px">AI App Builder</h2>
+      <p class="lede" style="margin-bottom:20px">Describe an app. A model running on your own machine &mdash; or the built-in scaffolder &mdash; writes it as a single HTML file you can preview, download and keep forever.</p>
+    </div>
+
+    <div class="b-grid">
+      <div>
+        <div class="card">
+          <div class="row" style="gap:8px">
+            <select id="bld-engine" class="input" style="flex:1.1">
+              <option value="heuristic">Scaffolder &middot; no model</option>
+              <option value="ollama">Ollama &middot; localhost</option>
+              <option value="openai">OpenAI-compatible</option>
+              <option value="webllm">WebLLM &middot; in-browser</option>
+              <option value="wllama">Uploaded .gguf</option>
+            </select>
+            <input id="bld-model" class="input mono" style="flex:1" placeholder="model name"/>
+          </div>
+          <div style="height:8px"></div>
+          <input id="bld-url" class="input mono" placeholder="http://localhost:11434" spellcheck="false"/>
+          <p class="hint" id="bld-engine-hint">No model required. The scaffolder assembles a real, working app from your description using built-in templates &mdash; fully offline.</p>
+        </div>
+
+        <div class="card">
+          <textarea id="bld-desc" class="ta" rows="5" placeholder="Describe your app, e.g. a todo list with dark mode and drag-free reordering"></textarea>
+          <div style="height:10px"></div>
+          <label class="chk" for="bld-custom-js">custom JavaScript logic</label>
+          <textarea id="bld-custom-js" class="ta mono" rows="6" placeholder="// Optional logic injected into the generated app\n// Example: document.querySelector('#cta').addEventListener('click', () =&gt; alert('Hello'));" spellcheck="false"></textarea>
+          <p class="hint">Injected into the downloaded app as an inline script. Use the generated app’s IDs/classes; no external runtime is required.</p>
+          <div style="height:6px"></div>
+          <button id="bld-go" class="btn gold w-full">&#10022; Build</button>
+          <div style="height:12px"></div>
+          <label class="chk"><input type="checkbox" id="bld-libchk" checked/> use my UI library as design context</label>
+          <div id="bld-pins" class="row wrap" style="gap:6px;margin-top:10px"></div>
+        </div>
+
+        <div class="card" style="padding:12px 14px">
+          <div class="row between">
+            <span class="mono" style="font-size:10px;letter-spacing:.2em;color:#7d8fae">ENGINE</span>
+            <span class="pill" id="bld-engine-badge">heuristic</span>
+          </div>
+          <div class="mono" style="font-size:11px;color:#6d7e9b;margin-top:6px" id="bld-stat">ready</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="padding:12px">
+          <div class="row between" style="margin-bottom:8px">
+            <span class="mono" style="font-size:10px;letter-spacing:.2em;color:#7d8fae">PREVIEW</span>
+            <span class="mono" style="font-size:10px;color:#6d7e9b" id="bld-bytes"></span>
+          </div>
+          <iframe id="bld-frame" class="frame" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
+        </div>
+        <div class="card" style="padding:12px">
+          <div class="row wrap" style="margin-bottom:10px">
+            <button id="bld-dl" class="btn gold">&#11015; Download HTML</button>
+            <button id="bld-zip" class="btn">&#128230; Download ZIP</button>
+            <button id="bld-save" class="btn">&#65291; Save to Library</button>
+            <button id="bld-open" class="btn ghost">&#8599; New tab</button>
+            <button id="bld-code-toggle" class="btn ghost">&#60;/&#62; Source</button>
+          </div>
+          <textarea id="bld-code" class="code hidden code" style="min-height:260px" spellcheck="false" placeholder="// generated HTML appears here"></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNTIME ============ -->
+  <section id="panel-runtime" class="panel hidden">
+    <div class="sect" style="margin-top:34px">
+      <h2 class="serif h1" style="font-size:44px">Runtime</h2>
+      <p class="lede" style="margin-bottom:20px">Pick the brain. Everything is swappable and nothing leaves this device unless you point it at a remote host.</p>
+    </div>
+
+    <div class="engines" id="engines">
+      <button class="eng" data-e="heuristic"><b>Scaffolder</b><span>no model &middot; instant</span></button>
+      <button class="eng" data-e="ollama"><b>Ollama</b><span>localhost:11434</span></button>
+      <button class="eng" data-e="openai"><b>OpenAI-compatible</b><span>LM Studio / vLLM</span></button>
+      <button class="eng" data-e="webllm"><b>WebLLM</b><span>in-browser GPU</span></button>
+      <button class="eng" data-e="wllama"><b>Upload .gguf</b><span>Wllama WASM</span></button>
+    </div>
+
+    <div class="card">
+      <div id="cfg-heuristic" class="cfgpane">
+        <p class="hint" style="margin:0">Zero setup. Deterministic single-file apps assembled from templates: todo, pomodoro, notes, kanban, budget, dashboard, landing page. Always offline, always instant.</p>
+      </div>
+
+      <div id="cfg-ollama" class="cfgpane hidden">
+        <label class="chk">endpoint</label>
+        <input id="cfg-ollama-url" class="input mono" spellcheck="false"/>
+        <div style="height:8px"></div>
+        <label class="chk">model</label>
+        <input id="cfg-ollama-model" class="input mono" spellcheck="false"/>
+        <p class="hint">Start Ollama with <b>OLLAMA_ORIGINS=* ollama serve</b> so this page may reach it. Then <b>ollama pull llama3.2</b>.</p>
+      </div>
+
+      <div id="cfg-openai" class="cfgpane hidden">
+        <label class="chk">base url</label>
+        <input id="cfg-oai-url" class="input mono" spellcheck="false"/>
+        <div style="height:8px"></div>
+        <label class="chk">model</label>
+        <input id="cfg-oai-model" class="input mono" spellcheck="false"/>
+        <div style="height:8px"></div>
+        <label class="chk">api key (optional)</label>
+        <input id="cfg-oai-key" class="input mono" type="password" spellcheck="false"/>
+        <p class="hint">Any endpoint that speaks <b>/v1/chat/completions</b>: LM Studio, llama.cpp server, vLLM, or a gateway.</p>
+      </div>
+
+      <div id="cfg-webllm" class="cfgpane hidden">
+        <label class="chk">in-browser model</label>
+        <select id="cfg-webllm-model" class="input">
+          <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama 3.2 1B &middot; ~0.7 GB</option>
+          <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC">Llama 3.2 3B &middot; ~1.9 GB</option>
+          <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen 2.5 1.5B &middot; ~1.0 GB</option>
+          <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi 3.5 mini &middot; ~2.2 GB</option>
+        </select>
+        <p class="hint">Weights download once through the browser cache, then run on WebGPU with no server. First build takes a few minutes.</p>
+      </div>
+
+      <div id="cfg-wllama" class="cfgpane hidden">
+        <label class="chk">model file (.gguf)</label>
+        <input id="cfg-gguf" class="input" type="file" accept=".gguf,.bin"/>
+        <p class="hint" id="cfg-gguf-state">No file loaded. The file is read straight from your disk into WASM memory &mdash; it is never uploaded. Re-pick it after a reload.</p>
+      </div>
+
+      <hr class="sep"/>
+      <div class="row wrap">
+        <button id="run-test" class="btn">&#9889; Test connection</button>
+        <button id="run-fallback" class="btn ghost">Reset to scaffolder</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between" style="margin-bottom:10px">
+        <span class="label" style="margin:0">Repository updates</span>
+        <span class="mono" style="font-size:11px;color:#7d8fae" id="update-state">not checked</span>
+      </div>
+      <p class="hint" style="margin-top:0">Checks the public source mirror for a newer standalone studio file. Your local app is never replaced automatically.</p>
+      <div class="row wrap">
+        <button id="check-updates" class="btn">&#8635; Check repository</button>
+        <button id="update-download" class="btn gold hidden">&#11015; Download latest</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between" style="margin-bottom:10px">
+        <span class="label" style="margin:0">Local storage</span>
+        <span class="mono" style="font-size:11px;color:#7d8fae" id="store-stat"></span>
+      </div>
+      <div class="row wrap">
+        <button id="data-export" class="btn">&#8681; Export all data</button>
+        <button id="data-import" class="btn">&#8682; Import JSON</button>
+        <input id="data-file" type="file" accept=".json" class="hidden"/>
+        <button id="data-clear" class="btn ghost">Clear library</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between" style="margin-bottom:10px">
+        <span class="label" style="margin:0">Log</span>
+        <button id="log-clear" class="btn tiny ghost">clear</button>
+      </div>
+      <div class="console" id="console"></div>
+    </div>
+  </section>
+
+  <!-- ============ LIBRARY ============ -->
+  <section id="panel-library" class="panel hidden">
+    <div class="sect" style="margin-top:34px">
+      <h2 class="serif h1" style="font-size:44px">Library</h2>
+      <p class="lede" style="margin-bottom:18px">Every converted page leaves behind its interfaces &mdash; navs, cards, heroes, buttons, forms. Pin them and the Builder writes new apps that speak the same visual language.</p>
+    </div>
+
+      <div class="card">
+        <div class="row wrap" style="margin-bottom:12px">
+        <div class="seg" style="margin:0;flex:1;min-width:240px" id="lib-seg">
+          <button class="seg-btn active" data-f="all">All</button>
+          <button class="seg-btn" data-f="app">Apps</button>
+          <button class="seg-btn" data-f="ui">Interfaces</button>
+        </div>
+        <input id="lib-search" class="input mono" style="max-width:260px" placeholder="search library" spellcheck="false"/>
+      </div>
+      <div class="mono" style="font-size:11px;color:#6d7e9b" id="lib-count"></div>
+      <div style="height:10px"></div>
+      <button id="lib-seed" class="btn tiny">&#10022; Add offline starter components</button>
+    </div>
+
+    <div class="libgrid" id="lib-grid"></div>
+  </section>
+
+</div>
+
+<div id="toasts"></div>
+<div id="modal" class="modal hidden">
+  <div class="modal-inner">
+    <div class="modal-head">
+      <span class="mono" style="font-size:11.5px;color:#a9b7cf" id="modal-title">preview</span>
+      <button class="x" id="modal-close">&#10005;</button>
+    </div>
+    <iframe id="modal-frame" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Sovereign Offline Studio — local-first app forge
+   ============================================================ */
+var $ = function(s,r){ return (r||document).querySelector(s); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+
+var PAEAN = window.Paean || window.paean || null;
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function fb(n){ if(!n) return '0 B'; if(n<1024) return n+' B'; if(n<1048576) return (n/1024).toFixed(1)+' KB'; return (n/1048576).toFixed(2)+' MB'; }
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function nowISO(){ return new Date().toISOString(); }
+function slug(s){ var t=String(s||'app').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,44); return t||'app'; }
+
+function toast(msg,kind){
+  var t=document.createElement('div');
+  t.className='toast '+(kind||''); t.textContent=msg;
+  $('#toasts').appendChild(t);
+  setTimeout(function(){ t.classList.add('out'); setTimeout(function(){ t.remove(); },320); },3300);
+}
+function download(name,text,type){
+  var b=new Blob([text],{type:type||'text/html;charset=utf-8'});
+  var u=URL.createObjectURL(b), a=document.createElement('a');
+  a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(u); },5000);
+}
+function downloadBlob(name,blob){
+  var u=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(u); },5000);
+}
+function crc32(bytes){
+  var c=4294967295;
+  for(var i=0;i<bytes.length;i++){
+    c^=bytes[i];
+    for(var j=0;j<8;j++) c=(c>>>1)^((c&1)?3988292384:0);
+  }
+  return (c^4294967295)>>>0;
+}
+function zipStore(files){
+  var enc=new TextEncoder(), parts=[], central=[], offset=0;
+  function u16(n){ var b=new Uint8Array(2); new DataView(b.buffer).setUint16(0,n,true); return b; }
+  function u32(n){ var b=new Uint8Array(4); new DataView(b.buffer).setUint32(0,n>>>0,true); return b; }
+  function join(arr){ var n=arr.reduce(function(a,b){return a+b.length},0), out=new Uint8Array(n), p=0; arr.forEach(function(b){out.set(b,p);p+=b.length}); return out; }
+  files.forEach(function(f){
+    var name=enc.encode(f.name), data=typeof f.data==='string'?enc.encode(f.data):new Uint8Array(f.data), crc=crc32(data);
+    var local=join([u32(67324752),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),name,data]);
+    parts.push(local);
+    central.push(join([u32(33639248),u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset),name]));
+    offset+=local.length;
+  });
+  var body=join(parts), dir=join(central), end=join([u32(101010256),u16(0),u16(0),u16(files.length),u16(files.length),u32(dir.length),u32(body.length),u16(0)]);
+  return new Blob([body,dir,end],{type:'application/zip'});
+}
+async function bundleHTML(html){
+  var doc=new DOMParser().parseFromString(html,'text/html'), files=[], used={}, count=0;
+  function assetName(url){
+    var clean=url.split(/[?#]/)[0], leaf=clean.split('/').pop()||('asset-'+(++count));
+    leaf=leaf.replace(/[^a-zA-Z0-9._-]+/g,'-');
+    var base='assets/'+leaf, n=1, out=base;
+    while(used[out]){ out='assets/'+leaf.replace(/(\.[^.]+)?$/,'-'+(n++)+'$1'); }
+    used[out]=1; return out;
+  }
+  var nodes=$$('[src],[href]',doc);
+  for(var i=0;i<nodes.length;i++){
+    var el=nodes[i], attr=el.hasAttribute('src')?'src':'href', raw=el.getAttribute(attr)||'';
+    if(!/^https?:\/\//i.test(raw)||/^https?:\/\/fonts\./i.test(raw)) continue;
+    try{
+      var path=assetName(raw), blob=await netGet(raw,true);
+      files.push({name:path,data:new Uint8Array(await blob.arrayBuffer())});
+      el.setAttribute(attr,path); count++;
+      log('bundled asset '+path,'ok');
+    }catch(e){ log('asset skipped '+raw.slice(0,70)+': '+e.message,'warn'); }
+  }
+  var styles=$$('style',doc);
+  for(var si=0;si<styles.length;si++){
+    var css=styles[si].textContent||'', matches=[], re=/url\(\s*(['"]?)(https?:\/\/[^)'"\s]+)\1\s*\)/gi, m;
+    while((m=re.exec(css))) matches.push({raw:m[0],url:m[2]});
+    for(var ci=0;ci<matches.length;ci++){
+      try{
+        var cssPath=assetName(matches[ci].url), cssBlob=await netGet(matches[ci].url,true);
+        files.push({name:cssPath,data:new Uint8Array(await cssBlob.arrayBuffer())});
+        css=css.replace(matches[ci].raw,'url("'+cssPath+'")'); count++;
+        log('bundled CSS asset '+cssPath,'ok');
+      }catch(e){ log('CSS asset skipped '+matches[ci].url.slice(0,70)+': '+e.message,'warn'); }
+    }
+    styles[si].textContent=css;
+  }
+  files.unshift({name:'index.html',data:'<!DOCTYPE html>\n'+doc.documentElement.outerHTML});
+  return {blob:zipStore(files),assets:files.length-1};
+}
+function blobToDataURL(blob){
+  return new Promise(function(res,rej){
+    var r=new FileReader();
+    r.onload=function(){ res(r.result); };
+    r.onerror=rej;
+    r.readAsDataURL(blob);
+  });
+}
+
+/* ---------------- state ---------------- */
+var SKEY='sos.v1';
+var S=(function(){
+  var raw={};
+  try{ raw=JSON.parse(localStorage.getItem(SKEY)||'{}'); }catch(e){}
+  var base={
+    engine:'heuristic',
+    ollamaUrl:'http://localhost:11434', ollamaModel:'llama3.2',
+    oaiUrl:'http://localhost:1234/v1', oaiModel:'local-model', oaiKey:'',
+	    webllmModel:'Llama-3.2-1B-Instruct-q4f16_1-MLC',
+    includeLibrary:true, maxImages:30, keepScripts:false, pinned:[], customJS:''
+  };
+  for(var k in raw){ if(Object.prototype.hasOwnProperty.call(raw,k)) base[k]=raw[k]; }
+  return base;
+})();
+function persist(){ try{ localStorage.setItem(SKEY, JSON.stringify(S)); }catch(e){} }
+
+var memLists={};
+function loadList(k){
+  try{ var v=JSON.parse(localStorage.getItem('sos.'+k)||'[]'); if(Array.isArray(v)) return v; }catch(e){}
+  return memLists[k]||[];
+}
+function saveList(k,v){
+  memLists[k]=v;
+  try{ localStorage.setItem('sos.'+k, JSON.stringify(v)); }catch(e){ toast('Storage full — export and trim your library','bad'); }
+}
+var APPS=loadList('apps');
+var UIS=loadList('ui');
+var LOGS=[];
+var PINNED=Array.isArray(S.pinned)?S.pinned.slice():[]; /* pinned ui snippet ids */
+var ARCH=null;      /* last sealed archive result */
+var LAST=null;      /* last built app {html,desc,name} */
+var GGUF=null;      /* uploaded model File */
+function persistPinned(){ S.pinned=PINNED.slice(); persist(); }
+
+/* ---------------- log ---------------- */
+function log(msg,tag){
+  var e={t:new Date().toLocaleTimeString([], {hour12:false}),msg:String(msg),tag:tag||''};
+  LOGS.unshift(e); if(LOGS.length>250) LOGS.pop();
+  renderLogs();
+}
+function renderLogs(){
+  var el=$('#console'); if(!el) return;
+  el.innerHTML=LOGS.slice(0,120).map(function(l){
+    return '<div class="l"><span class="t">'+esc(l.t)+'</span><span class="'+esc(l.tag)+'">'+esc(l.msg)+'</span></div>';
+  }).join('');
+}
+log('studio ready','ok');
+
+/* ============================================================
+   NETWORK — direct, then public relays
+   ============================================================ */
+var RELAYS=[
+  function(u){ return 'https://api.allorigins.win/raw?url='+encodeURIComponent(u); },
+  function(u){ return 'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u); },
+  function(u){ return 'https://corsproxy.io/?'+encodeURIComponent(u); }
+];
+function netGet(url,bin){
+  return fetch(url,{mode:'cors'}).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return bin? r.blob() : r.text();
+  }).catch(function(err){
+    log('direct blocked ('+err.message+') — trying relays','warn');
+    var i=0;
+    function next(){
+      if(i>=RELAYS.length) return Promise.reject(new Error('all routes blocked'));
+      var p=RELAYS[i++];
+      log('relay '+i+' → '+url.slice(0,60));
+      return fetch(p(url)).then(function(r){
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return bin? r.blob() : r.text();
+      }).then(function(v){
+        if(!bin && (!v || v.length<40)) throw new Error('empty response');
+        log('relay '+i+' ok ('+fb(bin? v.size : v.length)+')','ok');
+        return v;
+      }).catch(function(e){ log('relay '+i+' failed: '+e.message,'warn'); return next(); });
+    }
+    return next();
+  });
+}
+
+/* ============================================================
+   ARCHIVE — seal a page into one file + harvest its interfaces
+   ============================================================ */
+async function seal(html,baseUrl){
+  var doc=new DOMParser().parseFromString(html,'text/html');
+  var bEl=doc.querySelector('base');
+  var base=baseUrl||location.href;
+  if(bEl){ try{ base=new URL(bEl.getAttribute('href')||'.',base).href; }catch(e){} bEl.remove(); }
+  try{ base=new URL(base).href; }catch(e){}
+
+  /* 1. stylesheets → inline */
+  var css=$$('style',doc).map(function(s){ return s.textContent; }).join('\n');
+  var links=$$('link[rel~="stylesheet"][href]',doc).slice(0,14);
+  for(var i=0;i<links.length;i++){
+    var href=links[i].getAttribute('href');
+    try{
+      var u=new URL(href,base).href;
+      log('inline css '+u.slice(0,70));
+      var txt=await netGet(u,false);
+      css+='\n/* inlined: '+u+' */\n'+txt;
+    }catch(e){ log('css skipped: '+e.message,'warn'); }
+    links[i].remove();
+  }
+
+  /* 2. images → data URLs */
+  var imgs=$$('img[src]',doc).slice(0,Math.max(0,S.maxImages|0));
+  var done=0, fail=0;
+  for(var j=0;j<imgs.length;j++){
+    var raw=imgs[j].getAttribute('src');
+    if(/^data:/i.test(raw)) continue;
+    try{
+      var iu=new URL(raw,base).href;
+      var blob=await netGet(iu,true);
+      if(blob.size>3.5*1048576) throw new Error('image too large');
+      imgs[j].setAttribute('src', await blobToDataURL(blob));
+      imgs[j].removeAttribute('srcset');
+      imgs[j].removeAttribute('loading');
+      done++;
+    }catch(e){
+      fail++;
+      try{ imgs[j].setAttribute('src', new URL(raw,base).href); imgs[j].setAttribute('data-unsealed','1'); }catch(e2){}
+    }
+  }
+  if(imgs.length) log('images sealed '+done+(fail?(' · '+fail+' linked remotely'):''), done?'ok':'warn');
+
+  /* 3. strip active content */
+  if(!S.keepScripts){
+    $$('script',doc).forEach(function(s){ s.remove(); });
+    $$('iframe,object,embed,noscript',doc).forEach(function(s){ s.remove(); });
+    $$('[onclick],[onload],[onerror],[onmouseover]',doc).forEach(function(el){
+      el.removeAttribute('onclick'); el.removeAttribute('onload'); el.removeAttribute('onerror'); el.removeAttribute('onmouseover');
+    });
+    log('scripts stripped (toggle "keep scripts" to keep them)','warn');
+  }
+
+  /* 4. inject sealed css */
+  var st=doc.createElement('style');
+  st.setAttribute('data-sealed','1');
+  st.textContent=css;
+  (doc.head||doc.documentElement).appendChild(st);
+  if(!doc.querySelector('meta[charset]')){
+    var mc=doc.createElement('meta'); mc.setAttribute('charset','utf-8');
+    doc.head.insertBefore(mc,doc.head.firstChild);
+  }
+
+  var title=((doc.querySelector('title')||{}).textContent||'sealed page').trim();
+  var out='<!DOCTYPE html>\n<!-- sealed by Sovereign Offline Studio · '+nowISO()+' · '+ (baseUrl||'pasted source') +' -->\n'+doc.documentElement.outerHTML;
+  return {html:out,title:title,doc:doc,css:css,images:done,bytes:new Blob([out]).size};
+}
+
+function harvest(doc,source,title){
+  var cssAll=$$('style',doc).map(function(s){ return s.textContent; }).join('\n').slice(0,9000);
+  var specs=[
+    ['nav','nav, [role="navigation"], header'],
+    ['hero','[class*="hero"], main > section:first-of-type, body > section:first-of-type'],
+    ['card','[class*="card"], [class*="tile"], article'],
+    ['button','button, .btn, a[class*="btn"], [role="button"]'],
+    ['form','form'],
+    ['table','table'],
+    ['badge','[class*="badge"], [class*="tag"], [class*="chip"], [class*="pill"]'],
+    ['list','ul[class], ol[class]'],
+    ['footer','footer']
+  ];
+  var found=[], seen={};
+  for(var i=0;i<specs.length && found.length<20;i++){
+    var kind=specs[i][0], els=[];
+    try{ els=$$(specs[i][1],doc); }catch(e){ els=[]; }
+    for(var j=0;j<els.length && j<3;j++){
+      var h=(els[j].outerHTML||'').trim();
+      if(h.length<70||h.length>6500) continue;
+      var k=kind+'|'+h.length+'|'+h.slice(0,160);
+      if(seen[k]) continue; seen[k]=1;
+      var cls=(els[j].getAttribute('class')||'').split(/\s+/).filter(Boolean)[0];
+      var t=(els[j].textContent||'').replace(/\s+/g,' ').trim().slice(0,40);
+      found.push({
+        id:uid(), kind:kind,
+        name:(cls?('.'+cls):t)||kind,
+        html:h, css:cssAll,
+        source:source||'pasted', page:title||'',
+        createdAt:nowISO()
+      });
+      if(found.length>=20) break;
+    }
+  }
+  return found;
+}
+
+/* archive UI */
+var archMode='url';
+$$('#arch-seg .seg-btn').forEach(function(b){
+  b.onclick=function(){
+    archMode=b.getAttribute('data-mode');
+    $$('#arch-seg .seg-btn').forEach(function(x){ x.classList.toggle('active',x===b); });
+    $('#arch-url').classList.toggle('hidden',archMode!=='url');
+    $('#arch-paste').classList.toggle('hidden',archMode!=='paste');
+  };
+});
+function syncArchOpts(){
+  S.maxImages=parseInt($('#arch-max').value,10)||0;
+  S.keepScripts=$('#arch-scripts').checked;
+  persist();
+}
+['#arch-max','#arch-scripts'].forEach(function(sel){
+  var el=$(sel); if(el) el.addEventListener('change',syncArchOpts);
+});
+$('#arch-max').value=S.maxImages;
+$('#arch-scripts').checked=!!S.keepScripts;
+
+function showArchive(res,harvested){
+  ARCH=res;
+  $('#arch-out').classList.remove('hidden');
+  $('#arch-size').textContent=fb(res.bytes)+' · '+res.images+' images sealed';
+  $('#arch-preview').textContent=res.html.slice(0,2200)+(res.html.length>2200?'\n\n… '+fb(res.html.length)+' total':'');
+  var box=$('#arch-snips');
+  if(harvested && harvested.length){
+    box.innerHTML='<div class="card"><div class="row between" style="margin-bottom:10px"><span class="label" style="margin:0">Harvested interfaces</span><span class="mono" style="font-size:11px;color:#7d8fae">'+harvested.length+' items</span></div><div class="row wrap" style="gap:6px">'+
+      harvested.map(function(h){ return '<span class="chip ui">'+esc(h.kind)+' · '+esc(h.name.slice(0,22))+'</span>'; }).join('')+
+      '</div><div style="height:12px"></div><button class="btn" id="arch-tolib">&#65291; Send all to Library</button></div>';
+    $('#arch-tolib').onclick=function(){
+      UIS=harvested.concat(UIS).slice(0,120);
+      saveList('ui',UIS);
+      renderLibrary(); syncStore();
+      toast('Interfaces added to Library','ok');
+    };
+  } else box.innerHTML='';
+}
+
+$('#arch-go').onclick=async function(){
+  var url=$('#arch-input').value.trim();
+  if(!url) return toast('Paste a web address','bad');
+  if(!/^https?:\/\//i.test(url)) url='https://'+url;
+  var btn=this; btn.disabled=true; btn.textContent='Fetching…';
+  try{
+    log('fetch '+url);
+    var html=await netGet(url,false);
+    if(!/<html|<!doctype/i.test(html)) throw new Error('response was not HTML');
+    log('fetched '+fb(html.length),'ok');
+    var res=await seal(html,url);
+    var harvested=[];
+    if($('#arch-ui').checked){
+      harvested=harvest(res.doc,url,res.title);
+      log('harvested '+harvested.length+' interfaces','ok');
+    }
+    showArchive(res,harvested);
+    toast('Sealed '+res.title.slice(0,32),'ok');
+  }catch(e){
+    log('fetch failed: '+e.message,'bad');
+    toast('Could not fetch — try Paste HTML','bad');
+    $('#arch-paste').classList.remove('hidden');
+    $$('#arch-seg .seg-btn').forEach(function(x){ x.classList.toggle('active',x.getAttribute('data-mode')==='paste'); });
+    $('#arch-url').classList.add('hidden');
+  }
+  btn.disabled=false; btn.innerHTML='&#8615; Fetch &amp; convert';
+};
+
+$('#arch-seal').onclick=async function(){
+  var html=$('#arch-html').value.trim();
+  if(!html) return toast('Paste some HTML first','bad');
+  var btn=this; btn.disabled=true; btn.textContent='Sealing…';
+  try{
+    var res=await seal(html,null);
+    var harvested=$('#arch-ui').checked? harvest(res.doc,'pasted',res.title) : [];
+    if(harvested.length) log('harvested '+harvested.length+' interfaces','ok');
+    showArchive(res,harvested);
+    toast('Sealed pasted page','ok');
+  }catch(e){ log('seal failed: '+e.message,'bad'); toast('Seal failed','bad'); }
+  btn.disabled=false; btn.textContent='Seal pasted HTML';
+};
+
+$('#arch-dl').onclick=function(){
+  if(!ARCH) return;
+  download(slug(ARCH.title)+'.html',ARCH.html);
+  toast('Downloaded','ok');
+};
+$('#arch-open').onclick=function(){
+  if(!ARCH) return;
+  openModal(ARCH.title,ARCH.html);
+};
+$('#arch-lib').onclick=function(){
+  if(!ARCH) return;
+  APPS.unshift({id:uid(),name:ARCH.title.slice(0,70),prompt:'(sealed page)',html:ARCH.html,createdAt:nowISO(),engine:'archive'});
+  APPS=APPS.slice(0,80); saveList('apps',APPS);
+  renderLibrary(); syncStore(); toast('Saved to Library','ok');
+};
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+function openModal(title,html){
+  $('#modal-title').textContent=title||'preview';
+  $('#modal-frame').srcdoc=html;
+  $('#modal').classList.remove('hidden');
+}
+$('#modal-close').onclick=function(){ $('#modal').classList.add('hidden'); $('#modal-frame').srcdoc=''; };
+$('#modal').addEventListener('click',function(e){ if(e.target===$('#modal')) $('#modal-close').click(); });
+
+/* ============================================================
+   ENGINE LAYER
+   ============================================================ */
+var ENGINE_LABEL={heuristic:'scaffolder',ollama:'ollama',openai:'openai-compat',webllm:'webllm',wllama:'gguf'};
+
+function engineHint(e){
+  if(e==='heuristic') return 'No model required. The scaffolder assembles a real, working app from your description using built-in templates — fully offline.';
+  if(e==='ollama') return 'Talks to Ollama at the URL above. Run: OLLAMA_ORIGINS=* ollama serve';
+  if(e==='openai') return 'Any /v1/chat/completions endpoint: LM Studio, llama.cpp, vLLM.';
+  if(e==='webllm') return 'Runs a small model on your GPU in this tab. First build downloads weights (slow), after that it is cached.';
+  return 'Reads a .gguf from disk into WASM. Pick the file in Runtime.';
+}
+function syncBuilderEngine(){
+  var e=$('#bld-engine').value;
+  S.engine=e; persist();
+  $('#bld-engine-badge').textContent=ENGINE_LABEL[e]||e;
+  $('#bld-engine-hint').textContent=engineHint(e);
+  var urlEl=$('#bld-url'), mEl=$('#bld-model');
+  if(e==='ollama'){ urlEl.value=S.ollamaUrl; mEl.value=S.ollamaModel; urlEl.classList.remove('hidden'); mEl.classList.remove('hidden'); }
+  else if(e==='openai'){ urlEl.value=S.oaiUrl; mEl.value=S.oaiModel; urlEl.classList.remove('hidden'); mEl.classList.remove('hidden'); }
+  else if(e==='webllm'){ mEl.value=S.webllmModel; urlEl.classList.add('hidden'); mEl.classList.remove('hidden'); }
+  else if(e==='wllama'){ urlEl.classList.add('hidden'); mEl.classList.add('hidden'); }
+  else { urlEl.classList.add('hidden'); mEl.classList.add('hidden'); }
+  renderEngines(); syncCfgFields();
+}
+$('#bld-engine').addEventListener('change',syncBuilderEngine);
+$('#bld-url').addEventListener('change',function(){
+  if(S.engine==='ollama') S.ollamaUrl=this.value.trim();
+  if(S.engine==='openai') S.oaiUrl=this.value.trim();
+  persist();
+});
+$('#bld-model').addEventListener('change',function(){
+  if(S.engine==='ollama') S.ollamaModel=this.value.trim();
+  if(S.engine==='openai') S.oaiModel=this.value.trim();
+  persist();
+});
+
+function renderEngines(){
+  $$('#engines .eng').forEach(function(b){ b.classList.toggle('active',b.getAttribute('data-e')===S.engine); });
+}
+function syncCfgFields(){
+  $('#cfg-ollama-url').value=S.ollamaUrl;
+  $('#cfg-ollama-model').value=S.ollamaModel;
+  $('#cfg-oai-url').value=S.oaiUrl;
+  $('#cfg-oai-model').value=S.oaiModel;
+  $('#cfg-oai-key').value=S.oaiKey;
+  $('#cfg-webllm-model').value=S.webllmModel;
+  ['heuristic','ollama','openai','webllm','wllama'].forEach(function(k){
+    var el=$('#cfg-'+k); if(el) el.classList.toggle('hidden',k!==S.engine);
+  });
+}
+$$('#engines .eng').forEach(function(b){
+  b.onclick=function(){ S.engine=b.getAttribute('data-e'); persist(); $('#bld-engine').value=S.engine; syncBuilderEngine(); };
+});
+$('#cfg-ollama-url').addEventListener('change',function(){ S.ollamaUrl=this.value.trim()||'http://localhost:11434'; persist(); syncBuilderEngine(); });
+$('#cfg-ollama-model').addEventListener('change',function(){ S.ollamaModel=this.value.trim()||'llama3.2'; persist(); syncBuilderEngine(); });
+$('#cfg-oai-url').addEventListener('change',function(){ S.oaiUrl=this.value.trim(); persist(); syncBuilderEngine(); });
+$('#cfg-oai-model').addEventListener('change',function(){ S.oaiModel=this.value.trim(); persist(); syncBuilderEngine(); });
+$('#cfg-oai-key').addEventListener('change',function(){ S.oaiKey=this.value; persist(); });
+$('#cfg-webllm-model').addEventListener('change',function(){ S.webllmModel=this.value; persist(); syncBuilderEngine(); });
+$('#cfg-gguf').addEventListener('change',function(){
+  var f=this.files&&this.files[0];
+  if(!f){ GGUF=null; window.__ggufFile=null; $('#cfg-gguf-state').textContent='No file loaded. The file is read straight from your disk into WASM memory — it is never uploaded. Re-pick it after a reload.'; return; }
+  GGUF=f;
+  $('#cfg-gguf-state').innerHTML='<b>'+esc(f.name)+'</b> · '+fb(f.size)+' held in memory — never uploaded.';
+  log('gguf loaded: '+f.name+' ('+fb(f.size)+')','ok');
+  /* Keep the File reference for the wllama engine and connection test. */
+  window.__ggufFile=f;
+  toast('Model file read locally','ok');
+});
+$('#run-fallback').onclick=function(){ S.engine='heuristic'; persist(); $('#bld-engine').value='heuristic'; syncBuilderEngine(); toast('Switched to scaffolder','ok'); };
+
+async function runModel(prompt){
+  var e=S.engine;
+  if(e==='ollama') return ollamaGen(prompt);
+  if(e==='openai') return oaiGen(prompt);
+  if(e==='webllm') return webllmGen(prompt);
+  if(e==='wllama') return wllamaGen(prompt);
+  return heuristicGen(prompt);
+}
+
+function ollamaGen(prompt){
+  var url=(S.ollamaUrl||'http://localhost:11434').replace(/\/+$/,'');
+  log('ollama → '+url+' · '+S.ollamaModel);
+  return fetch(url+'/api/generate',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:S.ollamaModel,prompt:prompt,stream:false,options:{temperature:0.35,num_predict:4096}})
+  }).then(function(r){
+    if(!r.ok) throw new Error('Ollama HTTP '+r.status+' — is OLLAMA_ORIGINS=* set?');
+    return r.json();
+  }).then(function(j){
+    if(!j.response) throw new Error('empty model response');
+    log('ollama replied '+fb(j.response.length),'ok');
+    return j.response;
+  });
+}
+
+function oaiGen(prompt){
+  var base=(S.oaiUrl||'http://localhost:1234/v1').replace(/\/+$/,'');
+  var h={'Content-Type':'application/json'};
+  if(S.oaiKey) h['Authorization']='Bearer '+S.oaiKey;
+  log('openai-compat → '+base+' · '+S.oaiModel);
+  return fetch(base+'/chat/completions',{
+    method:'POST', headers:h,
+    body:JSON.stringify({model:S.oaiModel,temperature:0.35,max_tokens:4096,messages:[{role:'user',content:prompt}]})
+  }).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }).then(function(j){
+    var t=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
+    if(!t) throw new Error('empty model response');
+    log('model replied '+fb(t.length),'ok');
+    return t;
+  });
+}
+
+async function webllmGen(prompt){
+  log('webllm: importing runtime…');
+  var mod=await import('https://esm.run/@mlc-ai/web-llm');
+  if(!window.__mlc){
+    log('webllm: loading '+S.webllmModel+' (one-time download)','warn');
+    window.__mlc=await mod.CreateMLCEngine(S.webllmModel,{
+      initProgressCallback:function(p){ if(p&&p.text) log('webllm: '+p.text); }
+    });
+    log('webllm ready','ok');
+  }
+  var r=await window.__mlc.chat.completions.create({
+    messages:[{role:'user',content:prompt}], temperature:0.35, max_tokens:3500
+  });
+  return r.choices[0].message.content;
+}
+
+async function wllamaGen(prompt){
+  var file=window.__ggufFile;
+  if(!file) throw new Error('No .gguf loaded — pick one in Runtime → Upload .gguf');
+  if(!window.__wllama){
+    log('wllama: importing WASM runtime…');
+    var mod=await import('https://esm.run/@wllama/wllama');
+    var w=new mod.Wllama({'single-thread/wllama.wasm':'https://cdn.jsdelivr.net/npm/@wllama/wllama@2/src/single-thread/wllama.wasm'});
+    log('wllama: loading model weights into WASM…','warn');
+    await w.loadModel([file],{n_ctx:4096});
+    window.__wllama=w;
+    log('wllama ready','ok');
+  }
+  var out=await window.__wllama.createCompletion(prompt,{nPredict:1400,temperature:0.35});
+  return out;
+}
+
+/* ============================================================
+   HEURISTIC SCAFFOLDER — real apps, zero model
+   ============================================================ */
+function APPCSS(accent,dark){
+  return ':root{--a:'+accent+';--bg:'+(dark?'#0c1118':'#f6f7f9')+';--fg:'+(dark?'#e7eef7':'#10151b')+';--card:'+(dark?'#151b24':'#ffffff')+';--line:'+(dark?'#26313f':'#e3e7ec')+';--muted:'+(dark?'#8b9aad':'#5d6a78')+'}\n'+
+'*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;padding:32px 18px;line-height:1.55}\n'+
+'.wrap{max-width:760px;margin:0 auto}h1{font-size:27px;margin:0 0 4px;letter-spacing:-.01em}.sub{color:var(--muted);font-size:13px;margin:0 0 22px}\n'+
+'.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}\n'+
+'.row{display:flex;gap:10px;align-items:center}.row.between{justify-content:space-between}.grow{flex:1;min-width:0}\n'+
+'input,select,textarea{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:10px;padding:11px 13px;width:100%;outline:none}\n'+
+'input:focus,select:focus,textarea:focus{border-color:var(--a)}\n'+
+'button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--fg);padding:10px 15px}\n'+
+'button.primary{background:var(--a);border-color:var(--a);color:#141008;font-weight:650}\n'+
+'button.ghost{border-color:transparent;color:var(--muted)}\n'+
+'button.tiny{padding:5px 9px;font-size:12px}\n'+
+'.list{list-style:none;margin:14px 0;padding:0}\n'+
+'.item{display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.item:last-child{border-bottom:0}\n'+
+'.item.done span{opacity:.45;text-decoration:line-through}\n'+
+'.muted{color:var(--muted)}.big{font-size:34px;font-weight:700;letter-spacing:-.02em}\n'+
+'.pill{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}\n'+
+'.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}\n'+
+'.grid{display:grid;gap:10px}\n'+
+'.bars{display:flex;gap:6px;align-items:flex-end;height:120px;margin-top:14px}\n'+
+'.bars div{flex:1;background:var(--a);border-radius:5px 5px 0 0;min-height:4px;opacity:.85}\n'+
+'.hero{text-align:center;padding:56px 20px 40px}h2.hero-t{font-size:38px;margin:0 0 12px}\n'+
+'.feat{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}\n'+
+'@media(max-width:520px){body{padding:20px 14px}h1{font-size:22px}}';
+}
+function shell(title,accent,dark,body,js){
+  var pattern={html:'',css:''};
+  if(S.includeLibrary&&PINNED.length){
+    var u=UIS.filter(function(x){return x.id===PINNED[0]})[0];
+    if(u){
+      pattern.html='<div class="library-pattern" data-library-pattern="'+esc(u.kind||'interface')+'">'+String(u.html||'')+'</div>';
+      pattern.css=String(u.css||'').replace(/<\/style/gi,'<\\/style');
+    }
+  }
+  return '<!DOCTYPE html>\n<html lang="en"><head><meta charset="utf-8">'+
+  '<meta name="viewport" content="width=device-width,initial-scale=1">'+
+  '<title>'+esc(title)+'</title><style>'+APPCSS(accent,dark)+pattern.css+'</style></head><body>'+
+  '<div class="wrap">'+pattern.html+body+'</div>\n<scr'+'ipt>'+js+'</scr'+'ipt></body></html>';
+}
+function promptMeta(p){
+  var t=(p.split(/[.,;\n]/)[0]||'My App').trim();
+  t=t.charAt(0).toUpperCase()+t.slice(1);
+  if(t.length>52) t=t.slice(0,52);
+  var dark=!/light\b|white\b|bright\b/i.test(p);
+  var m=p.match(/#([0-9a-fA-F]{6})/);
+  var accent=m?('#'+m[1]):(dark?'#f0b94b':'#b9812a');
+  return {title:t,accent:accent,dark:dark};
+}
+var STOREJS='var S={g:function(k,d){try{var v=JSON.parse(localStorage.getItem("app."+k));return v==null?d:v}catch(e){return d}},s:function(k,v){try{localStorage.setItem("app."+k,JSON.stringify(v))}catch(e){}}};\n';
+
+function tplTodo(p,m){
+  var body='<h1>'+esc(m.title)+'</h1><p class="sub">Offline task board &middot; saved on this device</p>'+
+  '<div class="card"><form id="f" class="row"><input id="i" placeholder="Add a task and press enter" autocomplete="off"><button class="primary" type="submit">Add</button></form>'+
+  '<ul id="list" class="list"></ul>'+
+  '<div class="row between"><span id="cnt" class="muted" style="font-size:13px"></span><button class="ghost tiny" id="clr">Clear done</button></div></div>';
+  var js=STOREJS+
+  'var items=S.g("todo",[]);var list=document.getElementById("list"),f=document.getElementById("f"),i=document.getElementById("i");'+
+  'function save(){S.s("todo",items);render()}'+
+  'function render(){list.innerHTML="";items.forEach(function(t,n){var li=document.createElement("li");li.className="item"+(t.done?" done":"");'+
+  'var cb=document.createElement("input");cb.type="checkbox";cb.style.width="18px";cb.checked=t.done;cb.onchange=function(){items[n].done=cb.checked;save()};'+
+  'var sp=document.createElement("span");sp.className="grow";sp.textContent=t.text;'+
+  'var x=document.createElement("button");x.className="ghost tiny";x.textContent="\\u00d7";x.onclick=function(){items.splice(n,1);save()};'+
+  'li.appendChild(cb);li.appendChild(sp);li.appendChild(x);list.appendChild(li)});'+
+  'document.getElementById("cnt").textContent=items.filter(function(t){return !t.done}).length+" open \\u00b7 "+items.length+" total"}'+
+  'f.addEventListener("submit",function(e){e.preventDefault();var v=i.value.trim();if(!v)return;items.unshift({text:v,done:false});i.value="";save()});'+
+  'document.getElementById("clr").onclick=function(){items=items.filter(function(t){return !t.done});save()};render();';
+  return shell(m.title,m.accent,m.dark,body,js);
+}
+
+function tplTimer(p,m){
+  var body='<h1>'+esc(m.title)+'</h1><p class="sub">Focus cycle &middot; 25 / 5</p>'+
+  '<div class="card" style="text-align:center"><div class="big" id="t">25:00</div>'+
+  '<div class="muted" id="m" style="font-size:13px;margin-bottom:18px">focus session</div>'+
+  '<div class="row" style="justify-content:center;gap:8px"><button class="primary" id="go">Start</button><button id="rs">Reset</button></div></div>'+
+  '<div class="card row between"><span class="pill">completed</span><span id="done" class="big" style="font-size:22px">0</span></div>';
+  var js=STOREJS+
+  'var FOCUS=25*60,BREAK=5*60,left=FOCUS,running=false,mode="focus";'+
+  'var tEl=document.getElementById("t"),mEl=document.getElementById("m"),go=document.getElementById("go"),dEl=document.getElementById("done");'+
+  'var done=S.g("sessions",0);dEl.textContent=done;var iv=null;'+
+  'function paint(){var mm=Math.floor(left/60),ss=left%60;tEl.textContent=(mm<10?"0":"")+mm+":"+(ss<10?"0":"")+ss;mEl.textContent=mode==="focus"?"focus session":"break";go.textContent=running?"Pause":"Start"}'+
+  'function tick(){if(!running)return;left--;if(left<=0){if(mode==="focus"){mode="break";left=BREAK;done++;S.s("sessions",done);dEl.textContent=done}else{mode="focus";left=FOCUS}beep()}paint()}'+
+  'function beep(){try{var a=new (window.AudioContext||window.webkitAudioContext)();var o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=660;g.gain.value=.06;o.start();setTimeout(function(){o.stop()},240)}catch(e){}}'+
+  'go.onclick=function(){running=!running;if(running){iv=setInterval(tick,1000)}else{clearInterval(iv)}paint()};'+
+  'document.getElementById("rs").onclick=function(){running=false;clearInterval(iv);mode="focus";left=FOCUS;paint()};paint();';
+  return shell(m.title,m.accent,m.dark,body,js);
+}
+
+function tplNotes(p,m){
+  var body='<h1>'+esc(m.title)+'</h1><p class="sub">Local notes &middot; autosaved</p>'+
+  '<div class="card"><textarea id="n" rows="10" placeholder="Start typing…"></textarea>'+
+  '<div class="row between" style="margin-top:10px"><span class="muted" id="st" style="font-size:12px"></span><button class="ghost tiny" id="del">New</button></div></div>';
+  var js=STOREJS+
+  'var t=document.getElementById("n"),st=document.getElementById("st"),k="note";'+
+  't.value=S.g(k,"");function save(){S.s(k,t.value);st.textContent=t.value.length+" chars \\u00b7 saved "+new Date().toLocaleTimeString()}'+
+  't.addEventListener("input",save);document.getElementById("del").onclick=function(){if(confirm("Clear this note?")){t.value="";save()}};save();';
+  return shell(m.title,m.accent,m.dark,body,js);
+}
+
+function tplKanban(p,m){
+  var body='<h1>'+esc(m.title)+'</h1><p class="sub">Three-column board &middot; saved locally</p>'+
+  '<div class="card"><div class="row"><input id="i" placeholder="New card"><button class="primary" id="add">Add</button></div></div>'+
+  '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))" id="board"></div>';
+  var js=STOREJS+
+  'var COLS=["Todo","Doing","Done"];var cards=S.g("cards",[]);var board=document.getElementById("board");'+
+  'function save(){S.s("cards",cards);render()}'+
+  'function render(){board.innerHTML="";COLS.forEach(function(c,ci){var col=document.createElement("div");col.className="card";'+
+  'col.innerHTML="<div class=\\"pill\\">"+c+"</div>";'+
+  'cards.filter(function(x){return x.col===ci}).forEach(function(x){var d=document.createElement("div");d.className="item";'+
+  'var sp=document.createElement("span");sp.className="grow";sp.textContent=x.text;d.appendChild(sp);'+
+  'var nx=document.createElement("button");nx.className="ghost tiny";nx.textContent="\\u2192";'+
+  'nx.onclick=function(){x.col=(x.col+1)%3;save()};d.appendChild(nx);'+
+  'var rm=document.createElement("button");rm.className="ghost tiny";rm.textContent="\\u00d7";'+
+  'rm.onclick=function(){cards=cards.filter(function(y){return y!==x});save()};d.appendChild(rm);col.appendChild(d)});board.appendChild(col)});}'+
+  'document.getElementById("add").onclick=function(){var v=document.getElementById("i").value.trim();if(!v)return;cards.push({text:v,col:0});document.getElementById("i").value="";save()};'+
+  'document.getElementById("i").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("add").click()});render();';
+  return shell(m.title,m.accent,m.dark,body,js);
+}
+
+function tplExpense(p,m){
+  var body='<h1>'+esc(m.title)+'</h1><p class="sub">Spending tracker &middot; stored on this device</p>'+
+  '<div class="grid" style="grid-template-columns:1fr 1fr"><div class="stat"><div class="pill">total</div><div class="big" id="tot">$0</div></div>'+
+  '<div class="stat"><div class="pill">entries</div><div class="big" id="nn">0</div></div></div>'+
+  '<div class="card" style="margin-top:14px"><div class="row"><input id="l" placeholder="What for?" class="grow"><input id="a" type="number" step="0.01" placeholder="0.00" style="width:110px"><button class="primary" id="add">Add</button></div>'+
+  '<ul id="list" class="list"></ul></div>';
+  var js=STOREJS+
+  'var rows=S.g("spend",[]);var list=document.getElementById("list");'+
+  'function save(){S.s("spend",rows);render()}'+
+  'function money(n){return "$"+(Math.round(n*100)/100).toFixed(2)}'+
+  'function render(){list.innerHTML="";var tot=0;rows.forEach(function(r,i){tot+=r.amt;var li=document.createElement("li");li.className="item";'+
+  'var sp=document.createElement("span");sp.className="grow";sp.textContent=r.label;var am=document.createElement("span");am.textContent=money(r.amt);'+
+  'var x=document.createElement("button");x.className="ghost tiny";x.textContent="\\u00d7";x.onclick=function(){rows.splice(i,1);save()};'+
+  'li.appendChild(sp);li.appendChild(am);li.appendChild(x);list.appendChild(li)});'+
+  'document.getElementById("tot").textContent=money(tot);document.getElementById("nn").textContent=rows.length}'+
+  'document.getElementById("add").onclick=function(){var l=document.getElementById("l").value.trim(),a=parseFloat(document.getElementById("a").value);'+
+  'if(!l||!isFinite(a))return;rows.unshift({label:l,amt:a});document.getElementById("l").value="";document.getElementById("a").value="";save()};render();';
+  return shell(m.title,m.accent,m.dark,body,js);
+}
+
+function tplDash(p,m){
+  var body='<h1>'+esc(m.title)+'</h1><p class="sub">Editable metrics &middot; renders instantly</p>'+
+  '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))" id="cards"></div>'+
+  '<div class="card" style="margin-top:14px"><div class="pill">trend</div><div class="bars" id="bars"></div></div>'+
+  '<div class="card"><div class="row"><input id="nm" placeholder="Metric name" class="grow"><input id="vl" type="number" placeholder="value" style="width:110px"><button class="primary" id="add">Set</button></div></div>';
+  var js=STOREJS+
+  'var data=S.g("metrics",[{n:"Users",v:128},{n:"Revenue",v:42},{n:"Churn",v:7}]);'+
+  'function save(){S.s("metrics",data);render()}'+
+  'function render(){var c=document.getElementById("cards");c.innerHTML="";var mx=1;data.forEach(function(d){mx=Math.max(mx,d.v)});'+
+  'data.forEach(function(d){var el=document.createElement("div");el.className="stat";el.innerHTML="<div class=\\"pill\\"></div><div class=\\"big\\"></div>";'+
+  'el.querySelector(".pill").textContent=d.n;el.querySelector(".big").textContent=d.v;c.appendChild(el)});'+
+  'var b=document.getElementById("bars");b.innerHTML="";data.forEach(function(d){var bar=document.createElement("div");bar.style.height=(d.v/mx*100)+"%";b.appendChild(bar)})}'+
+  'document.getElementById("add").onclick=function(){var n=document.getElementById("nm").value.trim(),v=parseFloat(document.getElementById("vl").value);'+
+  'if(!n||isNaN(v))return;data=data.filter(function(d){return d.n!==n});data.push({n:n,v:v});save()};render();';
+  return shell(m.title,m.accent,m.dark,body,js);
+}
+
+function tplLanding(p,m){
+  var body='<div class="hero"><h2 class="hero-t">'+esc(m.title)+'</h2><p class="muted" style="max-width:46ch;margin:0 auto 22px">A focused, self-contained landing page generated offline. Edit the copy and ship it as one file.</p>'+
+  '<button class="primary" id="cta">Get started</button></div>'+
+  '<div class="feat"><div class="card"><b>Fast</b><p class="muted" style="font-size:13px;margin:6px 0 0">No build step, no dependencies, no tracking.</p></div>'+
+  '<div class="card"><b>Yours</b><p class="muted" style="font-size:13px;margin:6px 0 0">One HTML file that works from a USB stick in 2045.</p></div>'+
+  '<div class="card"><b>Quiet</b><p class="muted" style="font-size:13px;margin:6px 0 0">Everything runs locally, always.</p></div></div>'+
+  '<div class="card" style="margin-top:14px;text-align:center" id="msg"></div>';
+  var js='document.getElementById("cta").onclick=function(){document.getElementById("msg").textContent="Thanks — this is where your signup form would go."};';
+  return shell(m.title,m.accent,m.dark,body,js);
+}
+
+function heuristicGen(prompt){
+  var m=promptMeta(prompt);
+  var p=String(prompt).toLowerCase();
+  var rules=[
+    [/to-?do|task|checklist|chore|grocer/, tplTodo],
+    [/pomodoro|timer|focus|pomodoro|countdown|clock/, tplTimer],
+    [/note|journal|memo|diary|writing/, tplNotes],
+    [/kanban|board|sprint|backlog|trello/, tplKanban],
+    [/expense|budget|money|spend|finance|cost|invoice/, tplExpense],
+    [/dashboard|metric|analytic|chart|kpi|stats/, tplDash]
+  ];
+  for(var i=0;i<rules.length;i++){ if(rules[i][0].test(p)) return rules[i][1](prompt,m); }
+  return tplLanding(prompt,m);
+}
+
+/* ============================================================
+   BUILDER
+   ============================================================ */
+function buildPrompt(desc){
+  var p='You are an expert front-end engineer. Build a complete, polished, single-file web app.\n\n'+
+  'REQUEST: '+desc+'\n\n'+
+  'RULES:\n'+
+  '- Return ONLY HTML inside one ```html code block. No commentary, no explanation.\n'+
+  '- ONE file: inline <style> and <script>. No CDNs, no frameworks, no build step, no external fonts.\n'+
+  '- Must work fully offline when opened from disk. Persist data with localStorage inside try/catch.\n'+
+  '- Responsive, keyboard accessible, sensible empty states, no lorem ipsum in the core flow.\n'+
+  '- Ship the real functionality — no "TODO" placeholders, no dead buttons.\n'+
+  '- Clean modern visual design: generous spacing, one accent colour, system-ui font stack.';
+  if(S.includeLibrary){
+    var pins=PINNED.map(function(id){ return UIS.filter(function(u){return u.id===id})[0]; }).filter(Boolean);
+    var ctx=pins.length?pins:UIS.slice(0,3);
+    if(ctx.length){
+      p+='\n\nREUSE THESE INTERFACE PATTERNS FROM MY LIBRARY (match their markup structure and visual language):\n';
+      p+=ctx.map(function(u,i){ return '### '+(i+1)+'. '+u.kind+' — '+u.name+'\n'+String(u.html).slice(0,1100); }).join('\n\n');
+    }
+  }
+  if(S.customJS){
+    p+='\n\nCUSTOM JAVASCRIPT TO PRESERVE IN THE APP:\n'+S.customJS+'\nDo not remove this logic; keep it inline and offline-safe.\n';
+  }
+  return p;
+}
+
+function injectCustomJS(html,code){
+  code=String(code||'').trim();
+  if(!code) return html;
+  var safe=code.replace(/<\/script/gi,'<\\/script');
+  var tag='<scr'+'ipt data-custom-logic="1">\n'+safe+'\n</scr'+'ipt>';
+  return /<\/body>/i.test(html)?html.replace(/<\/body>/i,tag+'</body>'):html+tag;
+}
+
+function extractCode(text){
+  if(!text) return '';
+  var t=String(text);
+  var m=t.match(/```(?:html)?\s*([\s\S]*?)```/i);
+  if(m) t=m[1];
+  var i=t.search(/<!doctype html|<html[\s>]/i);
+  if(i>0) t=t.slice(i);
+  t=t.trim();
+  if(!/<html[\s>]/i.test(t)){
+    if(/<body|<div|<h1/i.test(t)){
+      t='<!DOCTYPE html>\n<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:system-ui;padding:24px;line-height:1.5}</style></head>'+t+'</html>';
+    }
+  }
+  return t;
+}
+
+function renderPins(){
+  var box=$('#bld-pins'); if(!box) return;
+  if(!PINNED.length){ box.innerHTML='<span class="mono" style="font-size:10.5px;color:#5d6e8c">pin interfaces in Library to steer the design</span>'; return; }
+  box.innerHTML=PINNED.map(function(id){
+    var u=UIS.filter(function(x){return x.id===id})[0];
+    if(!u) return '';
+    return '<span class="chip ui" style="cursor:pointer" data-unpin="'+esc(id)+'">'+esc(u.kind)+' &#10005;</span>';
+  }).join('');
+  $$('#bld-pins [data-unpin]').forEach(function(el){
+    el.onclick=function(){ PINNED=PINNED.filter(function(x){return x!==el.getAttribute('data-unpin')}); persistPinned(); renderPins(); };
+  });
+}
+
+$('#bld-libchk').checked=!!S.includeLibrary;
+$('#bld-libchk').addEventListener('change',function(){ S.includeLibrary=this.checked; persist(); renderPins(); });
+$('#bld-custom-js').value=S.customJS||'';
+$('#bld-custom-js').addEventListener('change',function(){ S.customJS=this.value; persist(); });
+
+$('#bld-go').onclick=async function(){
+  var desc=$('#bld-desc').value.trim();
+  if(!desc) return toast('Describe the app first','bad');
+  var btn=this; btn.disabled=true; btn.textContent='Building…';
+  $('#bld-engine-badge').textContent=ENGINE_LABEL[S.engine]||S.engine;
+  $('#bld-stat').textContent='working…';
+  log('build requested · engine='+S.engine);
+  try{
+    var raw;
+    if(S.engine==='heuristic'){ raw=heuristicGen(desc); log('scaffolder assembled app','ok'); }
+    else raw=await runModel(buildPrompt(desc));
+    var html=injectCustomJS(extractCode(raw),$('#bld-custom-js').value);
+    if(!html||html.length<120) throw new Error('model returned no usable HTML');
+    LAST={html:html,desc:desc,name:promptMeta(desc).title};
+    $('#bld-code').value=html;
+    $('#bld-frame').srcdoc=html;
+    $('#bld-stat').textContent=fb(new Blob([html]).size)+' · '+html.split('\n').length+' lines · ready';
+    $('#bld-bytes').textContent=fb(new Blob([html]).size);
+    log('built '+fb(new Blob([html]).size),'ok');
+    toast('App built','ok');
+  }catch(e){
+    $('#bld-stat').textContent='failed — see Runtime log';
+    log('build failed: '+e.message,'bad');
+    $('#bld-code').value='/* build failed */\n'+e.message+'\n\nTry the Scaffolder engine (no model required) or check the Runtime tab.';
+    toast('Build failed: '+e.message.slice(0,60),'bad');
+  }
+  btn.disabled=false; btn.innerHTML='&#10022; Build';
+};
+
+function needApp(){ if(!LAST){ toast('Build or convert something first','bad'); return false; } return true; }
+
+$('#bld-dl').onclick=function(){ if(!needApp())return; download(slug(LAST.name)+'.html',LAST.html); toast('Downloaded','ok'); };
+$('#bld-zip').onclick=async function(){
+  if(!needApp())return;
+  var btn=this; btn.disabled=true; btn.textContent='Bundling…';
+  try{
+    var pack=await bundleHTML(LAST.html);
+    downloadBlob(slug(LAST.name)+'.zip',pack.blob);
+    toast('ZIP exported · '+pack.assets+' external assets','ok');
+  }catch(e){ log('zip export failed: '+e.message,'bad'); toast('ZIP export failed','bad'); }
+  btn.disabled=false; btn.innerHTML='&#128230; Download ZIP';
+};
+$('#bld-open').onclick=function(){ if(!needApp())return; openModal(LAST.name,LAST.html); };
+$('#bld-save').onclick=function(){
+  if(!needApp())return;
+  APPS.unshift({id:uid(),name:LAST.name,prompt:LAST.desc,html:LAST.html,engine:S.engine,createdAt:nowISO()});
+  APPS=APPS.slice(0,80); saveList('apps',APPS);
+  renderLibrary(); syncStore(); toast('Saved to Library','ok');
+};
+$('#bld-code-toggle').onclick=function(){
+  $('#bld-code').classList.toggle('hidden');
+};
+$('#bld-desc').addEventListener('keydown',function(e){
+  if((e.metaKey||e.ctrlKey)&&e.key==='Enter') $('#bld-go').click();
+});
+
+/* ============================================================
+   LIBRARY
+   ============================================================ */
+var LIBF='all';
+$$('#lib-seg .seg-btn').forEach(function(b){
+  b.onclick=function(){
+    LIBF=b.getAttribute('data-f');
+    $$('#lib-seg .seg-btn').forEach(function(x){ x.classList.toggle('active',x===b); });
+    renderLibrary();
+  };
+});
+$('#lib-search').addEventListener('input',renderLibrary);
+function starterUIS(){
+  var css='.sos-starter{font-family:system-ui,sans-serif;color:#172033;background:#fff;padding:16px;border-radius:12px}.sos-starter *{box-sizing:border-box}.sos-toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between}.sos-toolbar button,.sos-starter button{border:1px solid #d8dfeb;border-radius:8px;padding:8px 12px;background:#f7f9fc}.sos-primary{background:#f0b94b!important;border-color:#d99b28!important}.sos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.sos-stat{border:1px solid #e0e6ef;border-radius:10px;padding:12px}.sos-stat strong{display:block;font-size:24px}.sos-form{display:flex;gap:8px}.sos-form input{flex:1;border:1px solid #d8dfeb;border-radius:8px;padding:9px}.sos-empty{border:1px dashed #bcc8da;border-radius:10px;padding:20px;text-align:center;color:#64748b}@media(max-width:560px){.sos-grid{grid-template-columns:1fr}.sos-toolbar,.sos-form{flex-wrap:wrap}}';
+  var base={source:'built-in/offline',page:'Sovereign starter kit',createdAt:nowISO()};
+  return [
+    {kind:'toolbar',name:'Offline toolbar',html:'<div class="sos-starter"><div class="sos-toolbar"><b>Workspace</b><div><button>Export</button> <button class="sos-primary">New item</button></div></div></div>'},
+    {kind:'stats',name:'Metric cards',html:'<div class="sos-starter"><div class="sos-grid"><div class="sos-stat"><small>Users</small><strong>1,248</strong></div><div class="sos-stat"><small>Tasks</small><strong>86</strong></div><div class="sos-stat"><small>Saved</small><strong>94%</strong></div></div></div>'},
+    {kind:'form',name:'Offline input form',html:'<div class="sos-starter"><form class="sos-form"><input placeholder="Add an item"><button class="sos-primary" type="submit">Add</button></form></div>'},
+    {kind:'empty',name:'Empty state',html:'<div class="sos-starter"><div class="sos-empty"><b>Nothing here yet</b><br><span>Create your first item to get started.</span><br><button class="sos-primary">Create item</button></div></div>'},
+    {kind:'notice',name:'Status notice',html:'<div class="sos-starter"><div role="status"><b>Saved locally.</b> Your data stays on this device.</div></div>'},
+    {kind:'table',name:'Compact table',html:'<div class="sos-starter"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left">Name</th><th style="text-align:left">Status</th><th style="text-align:right">Updated</th></tr></thead><tbody><tr><td>Sample item</td><td>Ready</td><td style="text-align:right">Today</td></tr></tbody></table></div>'}
+  ].map(function(x){ for(var k in base) x[k]=base[k]; x.id=uid(); x.css=css; return x; });
+}
+$('#lib-seed').onclick=function(){
+  var starters=starterUIS(), added=0;
+  starters.forEach(function(x){ if(!UIS.some(function(u){return u.name===x.name&&u.source==='built-in/offline'})){ UIS.push(x); added++; } });
+  UIS=UIS.slice(0,120); saveList('ui',UIS); renderLibrary(); syncStore();
+  toast(added+' offline starter components added','ok'); log('starter components added: '+added,'ok');
+};
+
+function itemPreviewHTML(item,isApp){
+  if(isApp) return item.html;
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+
+    (item.css||'')+'\nbody{margin:0;padding:14px;font-family:system-ui;background:#fff;color:#111}</style></head><body>'+
+    item.html+'</body></html>';
+}
+
+function renderLibrary(){
+  var grid=$('#lib-grid');
+  if(!grid) return;
+  var q=($('#lib-search').value||'').toLowerCase().trim();
+  var list=[];
+  if(LIBF!=='ui'){
+    APPS.forEach(function(a){
+      if(q && ((a.name||'')+' '+(a.prompt||'')).toLowerCase().indexOf(q)<0) return;
+      list.push({t:'app',d:a});
+    });
+  }
+  if(LIBF!=='app'){
+    UIS.forEach(function(u){
+      if(q && ((u.name||'')+' '+(u.kind||'')+' '+(u.source||'')).toLowerCase().indexOf(q)<0) return;
+      list.push({t:'ui',d:u});
+    });
+  }
+  $('#lib-count').textContent=list.length+' shown · '+APPS.length+' apps · '+UIS.length+' interfaces';
+  if(!list.length){
+    grid.innerHTML='<p class="empty">Nothing here yet. Seal a page in <b>Archive</b> or build an app in <b>Builder</b>.</p>';
+    return;
+  }
+  grid.innerHTML=list.map(function(it){
+    var d=it.d, isApp=it.t==='app';
+    var kindChip=isApp? '<span class="chip app">app</span>' : '<span class="chip ui">'+esc(d.kind)+'</span>';
+    var meta=isApp? (esc(d.engine||'')+' · '+fb((d.html||'').length)) : (esc((d.source||'').slice(0,26))+' · '+fb((d.html||'').length));
+    return '<div class="libcard" data-id="'+esc(d.id)+'" data-t="'+it.t+'">'+
+      kindChip+
+      '<div class="nm">'+esc(isApp? d.name : (d.kind+' · '+d.name))+'</div>'+
+      '<div class="meta">'+meta+'</div>'+
+      '<div class="thumb mt8" data-thumb="1" style="margin-top:10px"></div>'+
+      '<div class="row wrap" style="gap:6px">'+
+        '<button class="btn tiny" data-act="view">preview</button>'+
+        (isApp
+          ? '<button class="btn tiny" data-act="dl">html</button><button class="btn tiny" data-act="send">load</button>'
+          : '<button class="btn tiny" data-act="pin">pin</button><button class="btn tiny" data-act="dl">html</button>')+
+        '<button class="btn tiny ghost" data-act="del">&#10005;</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  /* inject previews */
+  $$('#lib-grid .libcard').forEach(function(card){
+    var id=card.getAttribute('data-id'), type=card.getAttribute('data-t');
+    var item=(type==='app'? APPS : UIS).filter(function(x){ return x.id===id; })[0];
+    if(!item) return;
+    var frame=document.createElement('iframe');
+    frame.setAttribute('sandbox','allow-scripts');
+    frame.srcdoc=itemPreviewHTML(item,type==='app');
+    card.querySelector('[data-thumb]').appendChild(frame);
+  });
+
+  /* actions */
+  $$('#lib-grid .libcard').forEach(function(card){
+    var id=card.getAttribute('data-id'), type=card.getAttribute('data-t');
+    var item=(type==='app'? APPS : UIS).filter(function(x){ return x.id===id; })[0];
+    if(!item) return;
+    $$('[data-act]',card).forEach(function(b){
+      b.onclick=function(e){
+        e.stopPropagation();
+        var a=b.getAttribute('data-act');
+        if(a==='view') openModal(item.name||item.kind, itemPreviewHTML(item,type==='app'));
+        else if(a==='dl') download(slug(item.name||item.kind)+'.html', itemPreviewHTML(item,type==='app'));
+        else if(a==='send'){
+          $('#bld-code').value=item.html; $('#bld-frame').srcdoc=item.html;
+          LAST={html:item.html,desc:item.prompt||'',name:item.name};
+          $('#bld-bytes').textContent=fb((item.html||'').length);
+          switchTab('builder'); toast('Loaded into Builder','ok');
+        }
+        else if(a==='pin'){
+          if(PINNED.indexOf(id)<0) PINNED.push(id);
+          persistPinned(); renderPins(); toast('Pinned for Builder','ok');
+        }
+        else if(a==='del'){
+          if(type==='app'){ APPS=APPS.filter(function(x){return x.id!==id}); saveList('apps',APPS); }
+          else { UIS=UIS.filter(function(x){return x.id!==id}); saveList('ui',UIS); }
+          renderLibrary(); syncStore(); toast('Removed');
+        }
+      };
+    });
+  });
+}
+
+/* ============================================================
+   RUNTIME extras
+   ============================================================ */
+var UPDATE_URL='https://raw.githubusercontent.com/onegayunicorn/sovereign-offline-studio/main/sovereign-offline-studio/02-standalone-html/Sovereign_Offline_Studio.html';
+var LATEST_SOURCE='';
+$('#check-updates').onclick=async function(){
+  var btn=this; btn.disabled=true; btn.textContent='Checking…';
+  try{
+    var r=await fetch(UPDATE_URL,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status);
+    LATEST_SOURCE=await r.text();
+    $('#update-state').textContent=fb(LATEST_SOURCE.length)+' source reachable';
+    $('#update-download').classList.remove('hidden');
+    log('repository source reachable · '+fb(LATEST_SOURCE.length),'ok'); toast('Repository update available to download','ok');
+  }catch(e){ $('#update-state').textContent='unavailable'; log('update check failed: '+e.message,'warn'); toast('Repository check failed','bad'); }
+  btn.disabled=false; btn.innerHTML='&#8635; Check repository';
+};
+$('#update-download').onclick=function(){ if(!LATEST_SOURCE)return; download('Sovereign_Offline_Studio-latest.html',LATEST_SOURCE); toast('Latest source downloaded','ok'); };
+$('#run-test').onclick=async function(){
+  var btn=this; btn.disabled=true; btn.textContent='Testing…';
+  var e=S.engine;
+  try{
+    if(e==='heuristic'){ log('scaffolder: always available','ok'); toast('Scaffolder is always ready','ok'); }
+    else if(e==='ollama'){
+      var r=await fetch(S.ollamaUrl.replace(/\/+$/,'')+'/api/tags');
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      var j=await r.json();
+      var names=(j.models||[]).map(function(m){ return m.name; });
+      log('ollama reachable · models: '+(names.slice(0,6).join(', ')||'none'),'ok');
+      toast(names.length? 'Ollama ok · '+names.length+' models':'Ollama ok, no models pulled','ok');
+    }
+    else if(e==='openai'){
+      var h={}; if(S.oaiKey) h['Authorization']='Bearer '+S.oaiKey;
+      var r2=await fetch(S.oaiUrl.replace(/\/+$/,'')+'/models',{headers:h});
+      if(!r2.ok) throw new Error('HTTP '+r2.status);
+      log('openai-compatible reachable','ok'); toast('Endpoint reachable','ok');
+    }
+    else if(e==='webllm'){
+      log('webllm: probing runtime import…');
+      await import('https://esm.run/@mlc-ai/web-llm');
+      var gpu=!!(navigator.gpu);
+      log('webllm import ok · WebGPU '+(gpu?'available':'MISSING'), gpu?'ok':'warn');
+      toast(gpu? 'WebGPU ready':'No WebGPU in this browser', gpu?'ok':'bad');
+    }
+    else if(e==='wllama'){
+      if(window.__ggufFile) log('gguf present: '+window.__ggufFile.name+' ('+fb(window.__ggufFile.size)+')','ok');
+      else throw new Error('no .gguf file picked');
+      toast('Model file ready','ok');
+    }
+  }catch(err){
+    log('test failed: '+err.message,'bad');
+    toast('Test failed: '+err.message.slice(0,52),'bad');
+  }
+  btn.disabled=false; btn.innerHTML='&#9889; Test connection';
+};
+
+function syncStore(){
+  var bytes=0;
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i);
+      if(k&&k.indexOf('sos.')===0) bytes+=(localStorage.getItem(k)||'').length;
+    }
+  }catch(e){}
+  var el=$('#store-stat');
+  if(el) el.textContent=fb(bytes)+' used · '+APPS.length+' apps · '+UIS.length+' interfaces';
+}
+$('#data-export').onclick=function(){
+  download('sovereign-studio-'+nowISO().slice(0,10)+'.json', JSON.stringify({version:1,state:S,apps:APPS,ui:UIS},null,2),'application/json');
+  toast('Exported','ok');
+};
+$('#data-import').onclick=function(){ $('#data-file').click(); };
+$('#data-file').addEventListener('change',function(){
+  var f=this.files&&this.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var j=JSON.parse(r.result);
+      if(Array.isArray(j.apps)){ APPS=j.apps.concat(APPS).slice(0,80); saveList('apps',APPS); }
+      if(Array.isArray(j.ui)){ UIS=j.ui.concat(UIS).slice(0,120); saveList('ui',UIS); }
+      if(j.state) for(var k in j.state){ if(Object.prototype.hasOwnProperty.call(S,k)) S[k]=j.state[k]; }
+      persist(); renderLibrary(); syncStore(); syncBuilderEngine(); $('#lib-search').value='';
+      toast('Imported','ok'); log('data imported','ok');
+    }catch(e){ toast('Bad JSON','bad'); log('import failed: '+e.message,'bad'); }
+  };
+  r.readAsText(f);
+});
+$('#data-clear').onclick=function(){
+  if(!confirm('Clear local apps and interface library? Export first if unsure.')) return;
+  APPS=[]; UIS=[]; PINNED=[];
+  saveList('apps',APPS); saveList('ui',UIS);
+  persistPinned();
+  renderLibrary(); renderPins(); syncStore(); toast('Library cleared');
+};
+$('#log-clear').onclick=function(){ LOGS=[]; renderLogs(); };
+
+/* ============================================================
+   TABS + BOOT
+   ============================================================ */
+function switchTab(name){
+  $$('#tabs .tab').forEach(function(t){ t.classList.toggle('active',t.getAttribute('data-tab')===name); });
+  ['archive','builder','runtime','library'].forEach(function(p){
+    var el=$('#panel-'+p);
+    if(el) el.classList.toggle('hidden',p!==name);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(name==='library') renderLibrary();
+  if(name==='runtime') syncStore();
+}
+$$('#tabs .tab').forEach(function(t){ t.onclick=function(){ switchTab(t.getAttribute('data-tab')); }; });
+
+function netState(){
+  var on=navigator.onLine;
+  $('#netstate').textContent=on?'online':'offline';
+  $('#netdot').classList.toggle('off',!on);
+}
+window.addEventListener('online',netState);
+window.addEventListener('offline',netState);
+
+/* boot */
+$('#bld-engine').value=S.engine;
+syncBuilderEngine();
+renderPins();
+renderLibrary();
+syncStore();
+netState();
+if(S.engine!=='heuristic') log('engine preset: '+S.engine,'ok');
+log('local storage: '+APPS.length+' apps · '+UIS.length+' interfaces');
+</script>
+</body>
+</html>
